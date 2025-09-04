@@ -1,0 +1,12 @@
+# Ignore build artifacts and binaries
+ex1/build/
+*.o
+*.hex
+*.out
+
+# Ignore VS Code settings
+.vscode/
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
