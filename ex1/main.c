@@ -1,15 +1,27 @@
-#define F_CPU 16000000UL
 #include <avr/io.h>
-#include <util/delay.h>
+#include <avr/interrupt.h>
+#include "uart0.h"
+
+static void on_rx(uint8_t b)
+{
+    // Echo received bytes (non-blocking)
+    while (!uart0_putc(b))
+    { /* optional: backoff or drop */
+    }
+}
 
 int main(void)
 {
-    DDRB |= (1 << PB0); // PB0 output
-    while (1)
+    uart0_init(9600); // 4.9152 MHz → UBRR=31 (exact 9600)
+    uart0_set_rx_callback(on_rx);
+    sei(); // enable global interrupts
+
+    uart0_write_str("UART0 ready\r\n");
+
+    for (;;)
     {
-        PORTB |= (1 << PB0);  // toggle
-        _delay_ms(250);       // 2 Hz (250 ms high + 250 ms low)
-        PORTB &= ~(1 << PB0); // toggle
-        _delay_ms(250);       // 2 Hz (250 ms high + 250 ms low)
+        // Or poll instead of callbacks:
+        // int16_t ch = uart0_getc();
+        // if (ch >= 0) uart0_putc((uint8_t)ch);
     }
 }
